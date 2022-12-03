@@ -13,6 +13,7 @@
 crash.log
 crash.*.log
 
+
 Будут проигнорированы файлы с расширением .tfvars или tfvars.json
 *.tfvars
 *.tfvars.json
@@ -21,3 +22,9 @@ crash.*.log
 Будут проигноированы файлы заканчивающиеся на _override.tf или _override.tf.json
 Будут проигнорированы файлы с расширением .terraformrc и файлы с именем terraform.rc
 ''
+
+
+test changes 
+
+
+test commit from IDE PyCharm 

@@ -64,14 +64,35 @@ echo netology > /proc/$$/fd/5
 	Напоминаем: по умолчанию через pipe передается только stdout команды слева от `|` на stdin команды справа.
 	Это можно сделать, поменяв стандартные потоки местами через промежуточный новый дескриптор, который вы научились создавать в предыдущем вопросе.
 
-Да, можно например через fd 10 
+Да, можно например через fd 10
+
+Решение:
 ```shell
-vagrant@vagrant:~$ ls -l 10>&2 2>&1 1>&10
-total 16
--rw-rw-r-- 1 vagrant vagrant 215 Jan  1 14:23 7~
--rw-rw-r-- 1 vagrant vagrant   2 Jan  1 13:42 grep_result
--rw-rw-r-- 1 vagrant vagrant  42 Jan  1 14:17 test
--rw-rw-r-- 1 vagrant vagrant   2 Jan  1 13:40 test3
+cat such no_found 10>&2 2>&1 1>&10 |grep such -c
+```
+
+Объяснение решения и демонстрация результата:
+10>&2 - новый дескриптор fd 10 перенаправил в stderr
+2>&1 - stderr перенаправил в stdout
+1>&10 - stdout перенаправил в новый дескриптор fd10
+
+Для примера сделал файл such с содержимым:
+such
+such
+such
+such
+
+Команда для демонстрации cat such no_found 
+such выведет 4 such, а no_found ошибку что файл не существует.
+Путём использования промежуточного дескриптора fd 10 в grep через канал pipe пришёл stderr  
+"cat: no_found: No such file or directory" что и продемонстрировано подсчётом через grep -c как 1 , а не 4 - если бы решение не сработало)
+```shell
+root@vagrant:/home/vagrant# cat such no_found 10>&2 2>&1 1>&10 |grep such -c
+such
+such
+such
+such
+1
 ```
 
 9. Что выведет команда `cat /proc/$$/environ`? Как еще можно получить аналогичный по содержанию вывод?
@@ -114,6 +135,31 @@ man ssh
 Дальше по инструкции здесь
 https://github.com/nelhage/reptyr
 поигрался перекинул и оставил в screen (tmux).
+
+Скриншоты:
+Открыл htop, нажал Ctrl + Z
+Ввёл команды которые на скриншоте
+
+![/img/img_10.png](/img/img_10.png)
+
+Открыл tmux, ввёл 
+reptyr 1517
+Появился htop
+
+![/img/img_11.png](/img/img_11.png)
+
+Нажал Ctrl + b , d отаттачился от tmux, посмотрел что tmux сессия создана через tmux ls
+
+![/img/img_12.png](/img/img_12.png)
+
+Переподключился к Ubuntu, 
+
+![/img/img_15.png](/img/img_15.png)
+
+Ввёл  mux attach , убедился что htop живёт в сессии tmux 
+
+![/img/img_16.png](/img/img_16.png)
+
 
 14. `sudo echo string > /root/new_file` не даст выполнить перенаправление под обычным пользователем, так как перенаправлением занимается процесс shell'а, который запущен без `sudo` под вашим пользователем. Для решения данной проблемы можно использовать конструкцию `echo string | sudo tee /root/new_file`. Узнайте? что делает команда `tee` и почему в отличие от `sudo echo` команда с `sudo tee` будет работать.
 

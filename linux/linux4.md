@@ -12,8 +12,8 @@ tar xvfz node_exporter-1.5.0.linux-amd64.tar.gz
 # переношу в opt
 mv node_exporter-1.5.0.linux-amd64 /opt/node_exporter
 # формирую файл для environment с тестовой переменной
-tee /etc/node_exporter.ini << EOF
-samplevar=samplevalue
+tee /etc/node_exporter.conf << EOF
+FLAGS=--log.level=warn
 EOF
 # формирую systemd файл для node_exporter
 tee /etc/systemd/system/node_exporter.service << EOF
@@ -21,8 +21,8 @@ tee /etc/systemd/system/node_exporter.service << EOF
 Description=Node Exporter
  
 [Service]
-ExecStart=/opt/node_exporter/node_exporter
-EnvironmentFile=/etc/node_exporter.ini
+EnvironmentFile=/etc/node_exporter.conf
+ExecStart=/opt/node_exporter/node_exporter \$FLAGS
  
 [Install]
 WantedBy=default.target
@@ -32,18 +32,24 @@ systemctl daemon-reload
 systemctl enable node_exporter --now
 
 ```
-В итоге, 
-сервис помещён в автозагрузку 
-опции могут быть добавлены через внешний файл /etc/node_exporter.ini
+В итоге, сервис помещён в автозагрузку 
+опции-флаги могут быть добавлены через внешний файл /etc/node_exporter.conf
 сервис успешно запускается, после перезагрузку автоматически поднимается
-Переменная через внешний файл выставляется
+Флаг log.level=warn выставлен
+
 ```shell
-root@vagrant:~#
-root@vagrant:~# ps aux |grep node_exporter
-root        1339  0.0  0.3 724920 12016 ?        Ssl  17:56   0:00 /opt/node_exporter/node_exporter
-root        1366  0.0  0.0   6432   724 pts/0    S+   17:56   0:00 grep --color=auto node_exporter
-root@vagrant:~# cat /proc/1339/environ
-LANG=en_US.UTF-8PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/binINVOCATION_ID=ea76a6960bbc4fa98f46788732b6b6d5JOURNAL_STREAM=9:26431samplevar=sampleval
+root@sysadm-fs:~# systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2023-01-15 17:30:38 UTC; 4s ago
+   Main PID: 15751 (node_exporter)
+      Tasks: 4 (limit: 2273)
+     Memory: 2.7M
+     CGroup: /system.slice/node_exporter.service
+             └─15751 /opt/node_exporter/node_exporter --log.level=warn
+
+Jan 15 17:30:38 sysadm-fs systemd[1]: Started Node Exporter.
+Jan 15 17:30:38 sysadm-fs node_exporter[15751]: ts=2023-01-15T17:30:38.370Z caller=node_exporter.go:183 level=warn msg=
 ```
 
 

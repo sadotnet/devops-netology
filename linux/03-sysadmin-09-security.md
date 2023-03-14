@@ -265,6 +265,11 @@ Host debian
 
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 Ответ:
+
+```sh
+ tcpdump -c 100 -w dum100.pcap
+```
+
 ![](img_9.png)
 
 

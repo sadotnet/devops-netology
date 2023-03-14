@@ -267,7 +267,7 @@ Host debian
 Ответ:
 
 ```sh
- tcpdump -c 100 -w dum100.pcap
+ tcpdump -c 100 -w dump100.pcap
 ```
 
 ![](img_9.png)

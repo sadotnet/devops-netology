@@ -7,23 +7,20 @@
 Создайте собственный образ любой операционной системы (например ubuntu-20.04) с помощью Packer ([инструкция](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/packer-quickstart)).
 
 Чтобы получить зачёт, вам нужно предоставить скриншот страницы с созданным образом из личного кабинета YandexCloud.
+
 Ответ: 
-Все сделал по инструкции , поставил обе программы, прописаны все пути. руки тоже правильно растут , обе программы доступны  из любого места доступны, 
-но при запуске получают ошибку о том что неизвестен builder yandex
 
+
+
+Установил в packer плагин yandex
 ```sh
-mac@MacBook-Pro-mac yc % yc version
-Yandex Cloud CLI 0.107.0 darwin/amd64
-mac@MacBook-Pro-mac yc % packer version
-Packer v1.9.1
-mac@MacBook-Pro-mac yc % packer build image.json 
-Error: Failed to initialize build "yandex"
-
-error initializing builder 'yandex': Unknown builder yandex
+mac ~ % packer plugins install github.com/hashicorp/yandex
+Installed plugin github.com/hashicorp/yandex v1.1.2 in "/Users/XXX/.config/packer/plugins/github.com/hashicorp/yandex/packer-plugin-yandex_v1.1.2_x5.0_darwin_amd64"
 ```
 
-images.json выглядит следующим образом, убрал чувствительные данные:
-
+После этого 
+packer build  image.json
+выполнил images.json (убрал чувствительные данные)
 ```sh
 {
     "builders": [
@@ -61,6 +58,9 @@ images.json выглядит следующим образом, убрал чу�
   
 ```
 
+Результат:
+
+![packer.png](packer.png)
 
 ## Задача 2
 

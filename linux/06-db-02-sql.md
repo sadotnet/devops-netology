@@ -24,7 +24,7 @@ services:
       - backup:/media/postgresql/backup
     environment:
       POSTGRES_USER: "test-admin-user"
-      POSTGRES_PASSWORD: "netology"
+      POSTGRES_PASSWORD: "12345"
       POSTGRES_DB: "test_db"
     restart: always
 ```

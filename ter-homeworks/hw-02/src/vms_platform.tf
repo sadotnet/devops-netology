@@ -8,8 +8,6 @@ variable "vm_web_resources" {
     }
 }
 
-
-
 variable "vm_db_ubuntu_family" {
   type    = string
   default = "ubuntu-2004-lts"

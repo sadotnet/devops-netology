@@ -9,7 +9,6 @@ resource "yandex_vpc_subnet" "develop" {
   v4_cidr_blocks = var.default_cidr
 }
 
-
 data "yandex_compute_image" "ubuntu" {
   family =  var.vm_web_resources.family
 }
@@ -39,7 +38,6 @@ resource "yandex_compute_instance" "platform" {
     serial-port-enable = 1
     ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
   }
-
 }
 
 resource "yandex_compute_instance" "platform-db" {

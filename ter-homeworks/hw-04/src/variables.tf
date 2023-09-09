@@ -28,22 +28,30 @@ variable "default_cidr" {
 variable "vpc_name" {
   type        = string
   default     = "develop"
-  description = "VPC network & subnet name"
+  description = "VPC network&subnet name"
 }
-###ssh vars
+
+###common vars
+
 variable "vms_ssh_root_key" {
   type        = string
-  # default     = "AAAAC3NzaC1lZDI1NTE5AAAAIMMlKIdKZOQH+/QtX18Y21Q2dsjmvoxr2jyiCGw3yN3B" - incorrect
-  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMMlKIdKZOQH+/QtX18Y21Q2dsjmvoxr2jyiCGw3yN3B vent"
+  default     = "your_ssh_ed25519_key"
   description = "ssh-keygen -t ed25519"
 }
 
-variable "env" {
-  type = string
-  default = "netology"
+###example vm_web var
+variable "vm_web_name" {
+  type        = string
+  default     = "netology-develop-platform-web"
+  description = "example vm_web_ prefix"
 }
 
-variable "project" {
-  type = string
-  default = "develop"
+###example vm_db var
+variable "vm_db_name" {
+  type        = string
+  default     = "netology-develop-platform-db"
+  description = "example vm_db_ prefix"
 }
+
+
+

@@ -28,22 +28,10 @@ variable "default_cidr" {
 variable "vpc_name" {
   type        = string
   default     = "develop"
-  description = "VPC network & subnet name"
-}
-###ssh vars
-variable "vms_ssh_root_key" {
-  type        = string
-  # default     = "AAAAC3NzaC1lZDI1NTE5AAAAIMMlKIdKZOQH+/QtX18Y21Q2dsjmvoxr2jyiCGw3yN3B" - incorrect
-  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMMlKIdKZOQH+/QtX18Y21Q2dsjmvoxr2jyiCGw3yN3B vent"
-  description = "ssh-keygen -t ed25519"
+  description = "VPC network&subnet name"
 }
 
-variable "env" {
-  type = string
-  default = "netology"
-}
-
-variable "project" {
-  type = string
-  default = "develop"
+variable "public_key" {
+  type    = string
+  default = ""
 }

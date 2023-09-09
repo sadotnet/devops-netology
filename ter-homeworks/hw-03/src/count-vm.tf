@@ -11,9 +11,9 @@ resource "yandex_compute_instance" "webservers" {
   count = 2
 
   resources {
-    cores  = 2
-    memory = 1
-    core_fraction = 20
+    cores  = var.vm_web_resources.vm1.cores
+    memory = var.vm_web_resources.vm1.memory
+    core_fraction = var.vm_web_resources.vm1.core_fraction
   }
 
   boot_disk {

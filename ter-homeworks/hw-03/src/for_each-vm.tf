@@ -20,7 +20,7 @@ resource "yandex_compute_instance" "databases" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = local.ssh_pub_key
   }
 
   scheduling_policy { preemptible = true }

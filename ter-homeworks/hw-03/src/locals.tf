@@ -1,5 +1,3 @@
-# variable "ssh_pub_key" {
-#   type    = string
-#   default = file("~/.ssh/id_rsa.pub")
-# }
-
+locals {
+  ssh_pub_key = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+}

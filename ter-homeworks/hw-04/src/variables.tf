@@ -53,5 +53,10 @@ variable "vm_db_name" {
   description = "example vm_db_ prefix"
 }
 
+variable "packages" {
+  type = list
+  default = ["nginx","vim","htop"]
+}
+
 
 

@@ -2,7 +2,13 @@ terraform {
   required_providers {
     yandex = {
       source = "yandex-cloud/yandex"
+      version = ">= 0.13"
     }
+     template = {
+      source  = "hashicorp/template"
+      version = ">= 2.0.0"
+    }
+
   }
   required_version = ">=0.13"
 
@@ -39,7 +45,6 @@ provider "yandex" {
 }
 
 
-
 #создаем облачную сеть
 resource "yandex_vpc_network" "develop" {
   name = "develop"
@@ -55,7 +60,7 @@ resource "yandex_vpc_subnet" "develop" {
 
 
 module "test-vm" {
-  source          = "git::https://github.com/udjin10/yandex_compute_instance.git?ref=main"
+  source          = "git::https://github.com/udjin10/yandex_compute_instance.git?ref=dev"
   env_name        = "develop"
   network_id      = yandex_vpc_network.develop.id
   subnet_zones    = ["ru-central1-a"]
@@ -68,17 +73,18 @@ module "test-vm" {
   metadata = {
       user-data          = data.template_file.cloudinit.rendered #Для демонстрации №3
       serial-port-enable = 1
+      disable-serial-console = "false"
+      
   }
-
-
-
 }
 
 #Пример передачи cloud-config в ВМ для демонстрации №3
 data "template_file" "cloudinit" {
- template = file("./cloud-init.yml")
+   template = file("./cloud-init.yml")
+
 }
 
 
 #terraform init -backend-config="access_key=<s3_access_key>" -backend-config="secret_key=<s3_secret_key>"
+
 

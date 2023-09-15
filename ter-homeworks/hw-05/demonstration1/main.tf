@@ -73,10 +73,9 @@ module "test-vm" {
   metadata = {
       user-data          = data.template_file.cloudinit.rendered #Для демонстрации №3
       serial-port-enable = 1
+      disable-serial-console = "false"
+      
   }
-
-
-
 }
 
 #Пример передачи cloud-config в ВМ для демонстрации №3
@@ -87,4 +86,5 @@ data "template_file" "cloudinit" {
 
 
 #terraform init -backend-config="access_key=<s3_access_key>" -backend-config="secret_key=<s3_secret_key>"
+
 

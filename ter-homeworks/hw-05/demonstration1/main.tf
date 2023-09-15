@@ -9,17 +9,14 @@ terraform {
 
   backend "s3" {
     endpoint = "storage.yandexcloud.net"
-    bucket = "tfstate-develop-my"
+    bucket = "state-lock-db"
     region = "ru-central1"
     key = "terraform.tfstate"
     skip_region_validation      = true
     skip_credentials_validation = true
-    dynamodb_endpoint = "https://docapi.serverless.yandexcloud.net/ru-central1/b1grng0r9tbanc9u316l/etn9nuvalhvt327cbinr"
-    dynamodb_table = "tfstate-lock"
+    dynamodb_endpoint = "https://docapi.serverless.yandexcloud.net/ru-central1/b1grng0r9tbanc9u316l/etn8aa5nk6vfus591eoi"
+    dynamodb_table = "state-lock-table"
   }
-
-
-
 
 # # Рабочий пример 
 #   backend "s3" {

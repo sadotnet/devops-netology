@@ -5,6 +5,33 @@ terraform {
     }
   }
   required_version = ">=0.13"
+
+
+  backend "s3" {
+    endpoint = "storage.yandexcloud.net"
+    bucket = "tfstate-develop-my"
+    region = "ru-central1"
+    key = "terraform.tfstate"
+    skip_region_validation      = true
+    skip_credentials_validation = true
+    dynamodb_endpoint = "https://docapi.serverless.yandexcloud.net/ru-central1/b1grng0r9tbanc9u316l/etn9nuvalhvt327cbinr"
+    dynamodb_table = "tfstate-lock"
+  }
+
+
+
+
+# # Рабочий пример 
+#   backend "s3" {
+#     endpoint = "storage.yandexcloud.net"
+#     bucket = "tfstate-develop-my"
+#     region = "ru-central1"
+#     key = "terraform.tfstate"
+#     skip_region_validation      = true
+#     skip_credentials_validation = true
+#   }
+
+
 }
 
 provider "yandex" {
@@ -29,6 +56,7 @@ resource "yandex_vpc_subnet" "develop" {
   v4_cidr_blocks = ["10.0.1.0/24"]
 }
 
+
 module "test-vm" {
   source          = "git::https://github.com/udjin10/yandex_compute_instance.git?ref=main"
   env_name        = "develop"
@@ -45,10 +73,15 @@ module "test-vm" {
       serial-port-enable = 1
   }
 
+
+
 }
 
 #Пример передачи cloud-config в ВМ для демонстрации №3
 data "template_file" "cloudinit" {
  template = file("./cloud-init.yml")
 }
+
+
+#terraform init -backend-config="access_key=<s3_access_key>" -backend-config="secret_key=<s3_secret_key>"
 

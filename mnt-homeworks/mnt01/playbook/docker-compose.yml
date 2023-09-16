@@ -1,0 +1,14 @@
+version: '3'
+services:
+  centos:
+    image: centos:7
+    container_name: centos
+    restart: unless-stopped
+    entrypoint: "sleep infinity"
+
+  ubuntu:
+    image: ubuntu
+    container_name: ubuntu
+    restart: unless-stopped
+    entrypoint: "sleep infinity"
+

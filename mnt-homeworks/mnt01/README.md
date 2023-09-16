@@ -145,6 +145,16 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 Ответ:
 ansible-doc -l -t connection
 
+Исправление:
+Я выбрал ansible.builtin.local и его прописал в prod.yml
+
+```sh
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local
+
+```
 
 ```sh
 xxx playbook % ansible-doc  -l -t connection

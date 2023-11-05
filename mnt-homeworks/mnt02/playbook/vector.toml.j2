@@ -1,0 +1,20 @@
+# vector.toml.j2
+
+# Vector configuration file
+
+# Set up data sources, called "sources"
+[sources.in]
+    type = "stdin"
+
+# Set up data sinks, called "sinks"
+[sinks.out]
+    # General
+    type = "clickhouse"
+    inputs = ["in"]
+    database = "logs"
+    table = "events"  # Имя таблицы, куда будут отправляться данные
+    endpoint = "http://{{ hostvars['clickhouse-01']['ansible_host'] }}:8123" # ClickHouse server URL
+
+    # Batch settings
+    batch.max_size = 1049000  # Max batch size (in bytes)
+    batch.timeout_secs = 1    # Max batch timeout (in seconds)

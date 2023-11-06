@@ -8,6 +8,6 @@ clickhouse:
 vector:
   hosts:
     vector-01:
-      ansible_host: <ip2>
+      ansible_host: <ip3>
       ansible_user: ubuntu
       name: ip_web

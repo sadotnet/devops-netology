@@ -2,3 +2,5 @@
 .idea
 .DS_Store
 ter-homeworks/hw-03/src/hosts.cfg
+mnt-homeworks/mnt02/playbook/inventory/prod.yml
+mnt-homeworks/mnt02/terraform/variables.tf

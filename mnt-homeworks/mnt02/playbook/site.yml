@@ -48,46 +48,59 @@
     vector_version: "0.33.1"
     vector_config_template: "vector.toml.j2"
     vector_config: "/etc/vector/vector.toml"
-
   tasks:
     - name: Update the package list
       ansible.builtin.apt:
         update_cache: true
 
     - name: Install dependencies
-      ansible.builtin.apt:
+      ansible.builtin.package:
         name:
           - curl
-        state: present
+
+    - name: Check if Vector .deb package is downloaded
+      ansible.builtin.stat:
+        path: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+      register: vector_deb_stat
 
     - name: Download Vector .deb package
       ansible.builtin.get_url:
         url: "https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb"
         dest: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
         mode: '0644'
+      when: not vector_deb_stat.stat.exists
 
     - name: Install Vector .deb package
       ansible.builtin.apt:
         deb: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+      notify: Restart Vector service
 
     - name: Check Vector version
       ansible.builtin.command: vector --version
       register: vector_version_output
       changed_when: false
 
-    # - name: Remove downloaded .deb file
-    #   ansible.builtin.file:
-    #     path: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
-    #     state: absent
+    - name: Remove downloaded .deb file
+      ansible.builtin.file:
+        path: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+        state: absent
+      when: not vector_deb_stat.stat.exists
 
     - name: Show Vector version
       ansible.builtin.debug:
         var: vector_version_output.stdout_lines
 
-    - name: Create Vector configuration file from template
+    - name: Configure Vector
       ansible.builtin.template:
         src: "{{ vector_config_template }}"
         dest: "{{ vector_config }}"
         owner: root
         group: root
         mode: '0644'
+      notify: Restart Vector service
+
+  handlers:
+    - name: Restart Vector service
+      ansible.builtin.service:
+        name: vector
+        state: restarted

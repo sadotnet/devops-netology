@@ -2,10 +2,12 @@
 clickhouse:
   hosts:
     clickhouse-01:
-      ansible_host: ip1
+      ansible_host: <ip1>
       ansible_user: centos
+      name: ip_db
 vector:
   hosts:
     vector-01:
-      ansible_host: ip2
+      ansible_host: <ip2>
       ansible_user: ubuntu
+      name: ip_web

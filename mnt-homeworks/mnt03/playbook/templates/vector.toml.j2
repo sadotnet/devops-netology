@@ -1,0 +1,88 @@
+# # vector.toml.j2
+
+# # Vector configuration file
+
+# # Set up data sources, called "sources"
+# [sources.in]
+#     type = "stdin"
+
+# # Set up data sinks, called "sinks"
+# [sinks.out]
+#     # General
+#     type = "clickhouse"
+#     inputs = ["in"]
+#     database = "logs"
+#     table = "events"  # Имя таблицы, куда будут отправляться данные
+#     endpoint = "http://{{ hostvars['clickhouse-01']['ansible_host'] }}:8123" # ClickHouse server URL
+
+#     # Batch settings
+#     batch.max_size = 1049000  # Max batch size (in bytes)
+#     batch.timeout_secs = 1    # Max batch timeout (in seconds)
+
+
+
+# # Vector configuration file
+# # Set up data sources, called "sources"
+# [sources.in]
+#     type = "stdin"
+
+# # Set up data transforms, called "transforms"
+# # No transforms are needed in this basic configuration
+
+# # Set up data sinks, called "sinks"
+# [sinks.out]
+#     # General
+#     type = "console"
+#     inputs = ["in"]
+#     target = "stdout"
+
+#     # Encoding
+#     encoding.codec = "json"
+
+
+
+
+#                                    __   __  __
+#                                    \ \ / / / /
+#                                     \ V / / /
+#                                      \_/  \/
+#
+#                                    V E C T O R
+#                                   Configuration
+#
+# ------------------------------------------------------------------------------
+# Website: https://vector.dev
+# Docs: https://vector.dev/docs
+# Chat: https://chat.vector.dev
+# ------------------------------------------------------------------------------
+
+# Change this to use a non-default directory for Vector data storage:
+# data_dir = "/var/lib/vector"
+
+# Random Syslog-formatted logs
+[sources.dummy_logs]
+type = "demo_logs"
+format = "syslog"
+interval = 1
+
+# Parse Syslog logs
+# See the Vector Remap Language reference for more info: https://vrl.dev
+[transforms.parse_logs]
+type = "remap"
+inputs = ["dummy_logs"]
+source = '''
+. = parse_syslog!(string!(.message))
+'''
+
+# Print parsed logs to stdout
+[sinks.print]
+type = "console"
+inputs = ["parse_logs"]
+encoding.codec = "json"
+
+# Vector's GraphQL API (disabled by default)
+# Uncomment to try it out with the `vector top` command or
+# in your browser at http://localhost:8686
+#[api]
+#enabled = true
+#address = "127.0.0.1:8686"

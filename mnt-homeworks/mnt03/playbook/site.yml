@@ -1,0 +1,173 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+  tasks:
+    - name: Handle Clickhouse distribution tasks
+      block:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
+            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
+            mode: '0644'
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
+            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
+            mode: '0644'
+
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.yum:
+        name:
+          - clickhouse-common-static-{{ clickhouse_version }}.rpm
+          - clickhouse-client-{{ clickhouse_version }}.rpm
+          - clickhouse-server-{{ clickhouse_version }}.rpm
+      notify: Start clickhouse service
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+
+- name: Install Vector
+  hosts: vector
+  become: true
+  vars:
+    vector_version: "0.33.1"
+    vector_config_template: "templates/vector.toml.j2"
+    vector_config: "/etc/vector/vector.toml"
+  tasks:
+    - name: Update the package list
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install dependencies
+      ansible.builtin.package:
+        name:
+          - curl
+
+    - name: Check if Vector .deb package is downloaded
+      ansible.builtin.stat:
+        path: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+      register: vector_deb_stat
+
+    - name: Download Vector .deb package
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/{{ vector_version }}/vector_{{ vector_version }}-1_amd64.deb"
+        dest: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+        mode: '0644'
+      when: not vector_deb_stat.stat.exists
+
+    - name: Install Vector .deb package
+      ansible.builtin.apt:
+        deb: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+      notify: Restart Vector service
+
+    - name: Check Vector version
+      ansible.builtin.command: vector --version
+      register: vector_version_output
+      changed_when: false
+
+    - name: Remove downloaded .deb file
+      ansible.builtin.file:
+        path: "/tmp/vector_{{ vector_version }}-1_amd64.deb"
+        state: absent
+      when: not vector_deb_stat.stat.exists
+
+    - name: Show Vector version
+      ansible.builtin.debug:
+        var: vector_version_output.stdout_lines
+
+    - name: Configure Vector
+      ansible.builtin.template:
+        src: "{{ vector_config_template }}"
+        dest: "{{ vector_config }}"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Vector service
+
+  handlers:
+    - name: Restart Vector service
+      ansible.builtin.service:
+        name: vector
+        state: restarted
+
+- name: Install Nginx
+  hosts: lighthouse
+  become: true
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Start Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+- name: Install Lighthouse
+  hosts: lighthouse
+  become: true
+
+  vars:
+    lighthouse_vcs: https://github.com/VKCOM/lighthouse.git
+    lighthouse_location_dir: /opt/lighthouse
+
+  pre_tasks:
+    - name: Install Git
+      ansible.builtin.apt:
+        name: git
+        state: present
+  tasks:
+    - name: Clone Lighthouse repository from GitHub
+      ansible.builtin.git:
+        repo: "{{ lighthouse_vcs }}"
+        version: master
+        dest: "{{ lighthouse_location_dir }}"
+
+    - name: Add Nginx configuration file for lighthouse site
+      ansible.builtin.template:
+        src: templates/nginx-lighthouse.conf.j2
+        dest: /etc/nginx/sites-available/default
+        mode: "0644"
+    - name: Enable Nginx site configuration
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+
+    - name: Validate Nginx configuration
+      ansible.builtin.command: nginx -t
+      register: result
+      changed_when: false
+      failed_when: result.rc != 0
+
+    - name: Trigger Nginx reload
+      ansible.builtin.meta: flush_handlers
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded

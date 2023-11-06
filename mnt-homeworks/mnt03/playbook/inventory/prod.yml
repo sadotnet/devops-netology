@@ -1,0 +1,17 @@
+---
+clickhouse:
+  hosts:
+    clickhouse-01:
+      ansible_host: ip1
+      ansible_user: centos
+vector:
+  hosts:
+    vector-01:
+      ansible_host: ip2
+      ansible_user: ubuntu
+lighthouse:
+  hosts:
+    light-01:
+      ansible_host: ip3
+      ansible_user: ubuntu
+

@@ -1,0 +1,23 @@
+---
+- name: Install Vector
+  hosts: vector
+  become: true
+  roles:
+  - vector-role
+  tasks:
+  - name: Ping host
+    ansible.builtin.ping:
+
+- name: Install Clickhouse
+  hosts: clickhouse
+  become: true
+  roles:
+    - clickhouse
+
+- name: Install Lighthouse
+  hosts: lighthouse
+  become: true
+  roles:
+    - lighthouse-role
+
+
